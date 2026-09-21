@@ -1,0 +1,108 @@
+1. def line_number(input_filename: str, output_filename: str) -> None:
+2.     try:
+3.         input_file = open(input_filename, "r", encoding="utf-8")
+4.         output_file = open(output_filename, "w", encoding="utf-8")
+5. 
+6.         number = 1
+7. 
+8.         for line in input_file:
+9.             line = line.rstrip("\n")
+10.             output_file.write("{}. {}\n".format(number, line))
+11.             number += 1
+12. 
+13.         input_file.close()
+14.         output_file.close()
+15. 
+16.     except OSError as error:
+17.         print("There was an error reading or writing the file.")
+18.         print(error)
+19.         raise
+20. 
+21. 
+22. def parse_functions(filename: str) -> tuple:
+23.     try:
+24.         input_file = open(filename, "r", encoding="utf-8")
+25.         lines = input_file.readlines()
+26.         input_file.close()
+27. 
+28.         functions = []
+29. 
+30.         for index in range(len(lines)):
+31.             line = lines[index]
+32. 
+33.             if line.startswith("def "):
+34.                 function_line = index + 1
+35. 
+36.                 definition = line.rstrip("\n")
+37. 
+38.                 if "#" in definition:
+39.                     definition = definition[:definition.find("#")].rstrip()
+40. 
+41.                 open_parenthesis = definition.find("(")
+42.                 close_parenthesis = definition.rfind(")")
+43. 
+44.                 function_name = definition[4:open_parenthesis]
+45.                 arguments = definition[
+46.                     open_parenthesis + 1:close_parenthesis
+47.                 ]
+48. 
+49.                 function_code = definition + "\n"
+50.                 next_line = index + 1
+51. 
+52.                 while next_line < len(lines):
+53.                     current_line = lines[next_line]
+54.                     stripped_line = current_line.strip()
+55. 
+56.                     if stripped_line == "":
+57.                         next_line += 1
+58.                         continue
+59. 
+60.                     if stripped_line.startswith("#"):
+61.                         next_line += 1
+62.                         continue
+63. 
+64.                     if current_line == current_line.lstrip():
+65.                         break
+66. 
+67.                     current_line = current_line.rstrip("\n")
+68. 
+69.                     if "#" in current_line:
+70.                         current_line = current_line[
+71.                             :current_line.find("#")
+72.                         ].rstrip()
+73. 
+74.                     if current_line.strip() != "":
+75.                         function_code += current_line + "\n"
+76. 
+77.                     next_line += 1
+78. 
+79.                 functions.append(
+80.                     (
+81.                         function_line,
+82.                         function_name,
+83.                         arguments,
+84.                         function_code
+85.                     )
+86.                 )
+87. 
+88.         functions.sort(key=lambda item: item[1])
+89. 
+90.         return tuple(functions)
+91. 
+92.     except OSError as error:
+93.         print("There was an error reading the file.")
+94.         print(error)
+95.         raise
+96. 
+97. 
+98. def main():
+99.     filename = "p1_Stojanovic_Veljko.py"
+100.     output_filename = "p1_Stojanovic_Veljko.py.txt"
+101. 
+102.     line_number(filename, output_filename)
+103. 
+104.     result = parse_functions(filename)
+105.     print(result)
+106. 
+107. 
+108. main()
